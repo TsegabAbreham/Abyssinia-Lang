@@ -1,5 +1,5 @@
 from node import *
-import env
+import interpreter.env as env
 from interpreter.evaluator import evaluate
 
 # Statement execution and program run separated into executor.

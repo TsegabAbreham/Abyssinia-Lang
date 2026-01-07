@@ -1,5 +1,5 @@
 from node import *
-import env
+import interpreter.env as env
 
 # Expression evaluation separated into its own module.
 def evaluate(node):
