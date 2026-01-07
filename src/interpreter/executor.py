@@ -44,7 +44,22 @@ def execute(stmt):
         elif stmt.else_body is not None:
             for s in stmt.else_body:
                 execute(s)
+    
+    # Loops
+    elif isinstance(stmt, WhileLoop):
+        while evaluate(stmt.condition):
+            for s in stmt.body:
+                execute(s)
+    
+    elif isinstance(stmt, ForLoop):
+        start = evaluate(stmt.start)
+        end = evaluate(stmt.end)
 
+        for i in range(start, end):
+            env.memory[stmt.var] = i
+            for s in stmt.body:
+                execute(s)
+                
     # Function definition
     elif isinstance(stmt, Functions):
         env.functions[stmt.name] = stmt

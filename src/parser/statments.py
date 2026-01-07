@@ -76,6 +76,8 @@ class StatementParser:
             return self.parse_input_statement()
         if t == "IF":
             return self.parse_conditionals()
+        if t == "WHILE":
+            return self.parse_while_loop()
         if t == "FUN":
             return self.parse_function()
         if t == "IDENTIFIER":

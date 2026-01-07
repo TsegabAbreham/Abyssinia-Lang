@@ -18,6 +18,14 @@ TOKEN_REGEX = [
     (r'ካልሆነ\b', 'ELSEIF'),
     (r'ለላ\b', 'ELSE'),
 
+    # Loops
+    (r'እያለ\b', 'WHILE'),
+    
+    (r'ለ\b', 'FOR'),
+    (r'ከ\b', 'FROM'),
+    (r'እስከ\b', 'TO'),
+
+
     # Functions
     (r'ተግባር\b', 'FUN'),
 
@@ -135,6 +143,6 @@ def tokenize(code):
 if __name__ == "__main__":
     print(tokenize("""
         ከሆነ(1+1 == 2 ወይም 2+2 == 4){
-                   አሳይ("ይሰራል!")።
+                   እያለ
                    } 
     """))

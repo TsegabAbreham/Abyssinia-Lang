@@ -5,15 +5,15 @@ Multiline Comments
 # Singleline comment #
 
 
-y = "ሰላም አለም"; # Variables #
+y = "ሰላም"; # Variables #
 
 # Conditionals #
 
-ከሆነ (1+1 == 2 እና 2+2==4){
-    አሳይ("ሃሃ")።     
+ከሆነ (1+1 == 2 እና 2+2==5) {
+    አሳይ(y)።     
 }
 ለላ {
-    አሳይ("ምም")።
+    አሳይ(":(")።
 }    
 
 # Functions #
@@ -31,5 +31,23 @@ y = "ሰላም አለም"; # Variables #
 አሳይ("ስላም " + ስም)።
 
 # List Variables #
+
 test = [1, 2, 3, 4, 5]።
 አሳይ(test[0])።
+
+# While Loops #
+
+ገ = 1።
+
+እያለ(ገ != 5){
+    አሳይ(ገ)።
+    ገ = ገ+1።
+}
+
+# For Loops #
+
+ሮ = 15።
+
+ለ (ሁ፣ ከ 1 እስከ ሮ+1){
+    አሳይ("*" * ሁ)።
+}

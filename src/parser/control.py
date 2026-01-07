@@ -8,6 +8,7 @@ class ControlParser:
         self.eat("LBRACKET")
         body = self.parse_block()
 
+
         elseif_cond = elseif_body = None
         if self.current()[0] == "ELSEIF":
             self.eat("ELSEIF")

@@ -1,6 +1,7 @@
 from node import *
 import interpreter.env as env
 
+
 # Expression evaluation separated into its own module.
 def evaluate(node):
     if isinstance(node, Number):
@@ -64,6 +65,7 @@ def evaluate(node):
         if node.prompt:
             return input(node.prompt)
         return input()
+
 
     else:
         raise Exception(f"Cannot evaluate node: {node}")

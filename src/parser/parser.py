@@ -5,6 +5,7 @@ from parser.lists import ListParser
 from parser.functions import FunctionParser
 from parser.control import ControlParser
 from parser.statments import StatementParser
+from parser.loops import WhileLoopParser, ForLoopParser
 from node import *
 from error import *
 
@@ -16,6 +17,8 @@ class Parser(
     FunctionParser,
     ControlParser,
     StatementParser,
+    WhileLoopParser, 
+    ForLoopParser
 ):
     def parse_statement(self):
         t = self.current()[0]
@@ -24,10 +27,15 @@ class Parser(
             return self.parse_print_statement()
         if t == "IF":
             return self.parse_conditionals()
+        if t == "WHILE":
+            return self.parse_while_loop()
+        if t == "FOR":
+            return self.parse_for_loop()
         if t == "FUN":
             return self.parse_function()
         if t == "IDENTIFIER":
             return self.parse_assignment_or_expr_statement()
+        
 
         raise unexpected_token(self)
 

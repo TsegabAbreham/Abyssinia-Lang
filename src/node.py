@@ -38,7 +38,7 @@ class AssignListElement:
         self.list_access = list_access  # ListAccess node
         self.value = value              # expression node
 
-
+# --- Keywords ---
 class Print:
     def __init__(self, expr):
         self.expr = expr
@@ -65,3 +65,16 @@ class FunctionCall:
 class Input:
     def __init__(self, prompt=None):
         self.prompt = prompt
+
+# --- Loops ---
+class WhileLoop:
+    def __init__(self, condition, body):
+        self.condition = condition
+        self.body = body
+
+class ForLoop:
+    def __init__(self, var, start, end, body):
+        self.var = var
+        self.start = start
+        self.end = end
+        self.body = body
