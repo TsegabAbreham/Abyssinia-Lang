@@ -2,6 +2,9 @@ from node import *
 import interpreter.env as env
 from interpreter.evaluator import evaluate
 
+from lexer import tokenize
+from parser import Parser
+
 # Statement execution and program run separated into executor.
 def execute(stmt):
     # Variable assignment
@@ -97,6 +100,31 @@ def execute(stmt):
     # expression statements
     elif isinstance(stmt, (ListAccessPos, BinOp, Variable, Number, String)):
         evaluate(stmt)
+
+        # executor.py
+    
+    elif isinstance(stmt, ImportStatement):
+        import_path = stmt.path
+        module_name = stmt.alias or import_path.split(".")[0]
+
+        # Read the file
+        with open(import_path, "r", encoding="utf-8") as f:
+            code = f.read()
+
+        # Tokenize and parse
+        tokens = tokenize(code)
+        parser = Parser(tokens)
+        ast = parser.parse()
+
+        # Create a local module scope
+        old_memory = env.memory.copy()
+        env.memory = {}  # isolate variables inside module
+        run(ast)
+        module_content = env.memory.copy()
+        env.memory = old_memory  # restore global memory
+
+        # Store module under its name
+        env.modules[module_name] = module_content
 
     else:
         raise Exception(f"Unknown statement type: {stmt}")

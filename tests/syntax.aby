@@ -5,6 +5,7 @@ Multiline Comments
 # Singleline comment #
 
 
+
 y = "ሰላም"። # Variables #
 
 # Conditionals #
@@ -75,3 +76,9 @@ text = አንብብ(r)።
 መ = "ሃ፣ላ፣ፍ፣ር፣እ፣ቅ"።
 አሳይ(ክፈል(መ፣ "፣"))።
 አሳይ(መ[0])።
+
+# Import #
+አስገባ "test.aby" እንደ ይይ
+
+አሳይ(ይይ፡ጸጋአብ)።
+

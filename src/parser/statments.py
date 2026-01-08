@@ -49,6 +49,8 @@ class StatementParser:
                 if isinstance(lhs, ListAccessPos):
                     return AssignListElement(lhs, expr)
                 return Assign(lhs, expr)
+            
+
 
             # not an assignment → force fallback
             raise ParseError("Not an assignment")
@@ -84,5 +86,7 @@ class StatementParser:
             return self.parse_assignment_or_expr_statement()
         if t == "LPAREN":
             return self.parse_expression_statement()
+        if t == "IMPORT":
+            return self.parse_import()
 
         raise unexpected_token(self)

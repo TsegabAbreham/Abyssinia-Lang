@@ -33,6 +33,10 @@ class ExpressionParser:
         if type_ == "IDENTIFIER":
             name = self.eat("IDENTIFIER")
 
+            if self.current()[0] == "DOT":
+                self.eat("DOT")
+                member = self.eat("IDENTIFIER")
+                return ModuleAccess(name, member)
             # function call: f(...)
             if self.current()[0] == "LPAREN":
                 return self.parse_function_call(name)

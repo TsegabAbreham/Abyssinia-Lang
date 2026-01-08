@@ -29,9 +29,15 @@ TOKEN_REGEX = [
     # Functions
     (r'ተግባር\b', 'FUN'),
 
-    # Key words
+    #################### 
+    ##### Key words ####
+    ####################
     (r'አሳይ\b', 'PRINT'), 
     (r'ጠይቅ\b', 'INPUT'),
+
+    # Imports
+    (r'አስገባ\b', 'IMPORT'),
+    (r'እንደ\b', 'AS'),
 
     # Mathematical Operation
     (r'\d+', 'NUMBER'),
@@ -57,11 +63,11 @@ TOKEN_REGEX = [
     (r'(["\'])(.*?)\1', 'STRING'),  
     (r'\b[\wሀ-ፐ]+\b', 'IDENTIFIER'),
              
-    
 ]
 
 # Single-character tokens
 SINGLE_CHAR_TOKENS = {
+    '.': 'DOT',
     ';': 'SEMICOLON',
     '(': 'LPAREN',
     ')': 'RPAREN',
@@ -79,6 +85,7 @@ def normalize_code(code):
     # Replace single character tokens with UTF
     code = code.replace('።', ';')
     code = code.replace('፣', ',')
+    code = code.replace('፡', '.')
 
     # Replace multi character tokens with UTF
     code = code.replace('እና', '&&')

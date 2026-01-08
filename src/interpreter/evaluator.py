@@ -19,11 +19,9 @@ def evaluate(node):
             return builtins[node.name]
         raise Exception(f"Undefined variable '{node.name}'")
         
-    # List literal: [1, 2, 3]
     elif isinstance(node, ListAssign) and node.name is None:
         return [evaluate(item) for item in node.values]
 
-    # List access: test[0]
     elif isinstance(node, ListAccessPos):
         if node.name not in env.memory:
             raise Exception(f"Undefined list '{node.name}'")
@@ -78,6 +76,14 @@ def evaluate(node):
             return func.call(args)
 
         raise Exception(f"'{node.name}' is not callable")
+
+    elif isinstance(node, ModuleAccess):
+        if node.module_name not in env.modules:
+            raise Exception(f"Module '{node.module_name}' is not imported")
+        module = env.modules[node.module_name]
+        if node.member_name not in module:
+            raise Exception(f"Module '{node.module_name}' has no member '{node.member_name}'")
+        return module[node.member_name]
 
 
     else:

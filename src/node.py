@@ -78,3 +78,14 @@ class ForLoop:
         self.start = start
         self.end = end
         self.body = body
+
+# --- Imports ---
+class ImportStatement:
+    def __init__(self, path, alias=None):
+        self.path = path
+        self.alias = alias
+
+class ModuleAccess:
+    def __init__(self, module_name, member_name):
+        self.module_name = module_name
+        self.member_name = member_name
