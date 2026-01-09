@@ -75,8 +75,14 @@ text = አንብብ(r)።
 አሳይ(ክፈል(መ፣ "፣"))።
 አሳይ(መ[0])።
 
-# Import #
+# Request #
+url = "https://pokeapi.co/api/v2/pokemon/"።
+
+አሳይ(አግኝ("https://pokeapi.co/api/v2/pokemon/pikachu"
+፣ "ብቻ"))።
+
+################ 
+# ---Import--- #
+################
+
 አስገባ "test.aby" እንደ ይይ
-
-አሳይ(ይይ፡ጸጋአብ)።
-

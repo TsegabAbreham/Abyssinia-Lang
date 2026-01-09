@@ -28,10 +28,10 @@ def b_pow(x, y):
     return pow(x, y)
 
 def b_max(*n):
-    max(n)
+    return max(n)
 
 def b_min(*n):
-    min(n)
+    return min(n)
 
 def b_randint(a, b):
     return random.randint(a, b)
@@ -122,3 +122,25 @@ builtins["ክፈት"]  = BuiltinFunction(b_open, 2)
 builtins["አንብብ"]  = BuiltinFunction(b_read, 1)
 builtins["ጻፍ"] = BuiltinFunction(b_write, 2)
 builtins["ዝጋ"] = BuiltinFunction(b_close, 1)
+
+# --------- REQUESTING ------------
+import requests
+
+def b_get(url, mode):
+    resp = requests.get(url)
+
+    if mode == "አዎ":  # status + body
+        return {
+            "status": resp.status_code,
+            "body": resp.json()
+        }
+
+    elif mode == "ብቻ":  # status only
+        return resp.status_code
+
+    else:  # body only
+        return resp.text
+
+
+    
+builtins["አግኝ"] = BuiltinFunction(b_get, 2)

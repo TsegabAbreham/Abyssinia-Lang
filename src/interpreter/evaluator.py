@@ -80,10 +80,15 @@ def evaluate(node):
     elif isinstance(node, ModuleAccess):
         if node.module_name not in env.modules:
             raise Exception(f"Module '{node.module_name}' is not imported")
+        
         module = env.modules[node.module_name]
+
         if node.member_name not in module:
             raise Exception(f"Module '{node.module_name}' has no member '{node.member_name}'")
-        return module[node.member_name]
+        
+        return module[node.member_name]  # Functions node or variable
+
+
 
 
     else:

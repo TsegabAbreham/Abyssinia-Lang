@@ -69,33 +69,42 @@ def execute(stmt):
 
     # Function call
     elif isinstance(stmt, FunctionCall):
-        # Check if it's a user-defined function first
+        # First check local functions
         if stmt.name in env.functions:
             func = env.functions[stmt.name]
 
-            if len(stmt.args) != len(func.params):
-                raise Exception(
-                    f"Function '{stmt.name}' expects {len(func.params)} arguments "
-                    f"but got {len(stmt.args)}"
-                )
-
-            # Evaluate arguments
-            arg_values = [evaluate(arg) for arg in stmt.args]
-
-            # Create local scope for the call
-            old_memory = env.memory
-            env.memory = {**env.memory, **dict(zip(func.params, arg_values))}
-
-            # Execute the function body
-            for s in func.body:
-                execute(s)
-
-            # Restore previous memory
-            env.memory = old_memory
-
         else:
-            # If it's not a user function, treat it as an expression (built-in)
-            evaluate(stmt)
+            # Look in imported modules
+            found = False
+            for module in env.modules.values():
+                if stmt.name in module and isinstance(module[stmt.name], Functions):
+                    func = module[stmt.name]
+                    found = True
+                    break
+            if not found:
+                # Maybe built-in
+                return evaluate(stmt)
+
+        # Check argument count
+        if len(stmt.args) != len(func.params):
+            raise Exception(
+                f"Function '{stmt.name}' expects {len(func.params)} arguments but got {len(stmt.args)}"
+            )
+
+        # Evaluate arguments
+        arg_values = [evaluate(arg) for arg in stmt.args]
+
+        # Create local memory for function
+        old_memory = env.memory
+        env.memory = {**env.memory, **dict(zip(func.params, arg_values))}
+
+        # Execute function body statements
+        for s in func.body:
+            execute(s)
+
+        # Restore previous memory
+        env.memory = old_memory
+
 
     # expression statements
     elif isinstance(stmt, (ListAccessPos, BinOp, Variable, Number, String)):
@@ -116,16 +125,19 @@ def execute(stmt):
         parser = Parser(tokens)
         ast = parser.parse()
 
-        # Create a local module scope
-        old_memory = env.memory.copy()
-        env.memory = {}  # isolate variables inside module
-        run(ast)
-        module_content = env.memory.copy()
-        env.memory = old_memory  # restore global memory
+        # Create a module dictionary
+        module_content = {}
 
-        # Store module under its name
+        for node in ast:
+            if isinstance(node, Assign):
+                module_content[node.name] = evaluate(node.value)
+            elif isinstance(node, Functions):
+                # store the function AST node
+                module_content[node.name] = node
+
+        # Store the module in env.modules
         env.modules[module_name] = module_content
-
+    
     else:
         raise Exception(f"Unknown statement type: {stmt}")
 
