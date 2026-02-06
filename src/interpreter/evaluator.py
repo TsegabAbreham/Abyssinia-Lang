@@ -2,6 +2,7 @@ from node import *
 import interpreter.env as env
 
 from runtime.builtins import builtins, BuiltinFunction
+from error import InterpreterError
 
 # Expression evaluation separated into its own module.
 def evaluate(node):
@@ -17,14 +18,14 @@ def evaluate(node):
         
         if node.name in builtins:
             return builtins[node.name]
-        raise Exception(f"Undefined variable '{node.name}'")
+        raise InterpreterError(f"Undefined variable '{node.name}'")
         
     elif isinstance(node, ListAssign) and node.name is None:
         return [evaluate(item) for item in node.values]
 
     elif isinstance(node, ListAccessPos):
         if node.name not in env.memory:
-            raise Exception(f"Undefined list '{node.name}'")
+            raise InterpreterError(f"Undefined list '{node.name}'")
         lst = env.memory[node.name]
         index = evaluate(node.index)
         return lst[index]
@@ -61,7 +62,7 @@ def evaluate(node):
             return left or right
 
         else:
-            raise Exception(f"Unknown operator '{node.op}'")
+            raise InterpreterError(f"Unknown operator '{node.op}'")
 
     elif isinstance(node, Input):
         if node.prompt:
@@ -85,7 +86,7 @@ def evaluate(node):
         # User-defined function AST (Functions)
         if isinstance(func, Functions):
             if len(args) != len(func.params):
-                raise Exception(
+                raise InterpreterError(
                     f"Function '{func.name}' expects {len(func.params)} arguments but got {len(args)}"
                 )
 
@@ -99,7 +100,7 @@ def evaluate(node):
             env.memory = old_memory
             return None
 
-        raise Exception(f"'{getattr(node.name, 'name', node.name)}' is not callable")
+        raise InterpreterError(f"'{getattr(node.name, 'name', node.name)}' is not callable")
 
     elif isinstance(node, ClassCall):
         classname = evaluate(Variable(node.name))
@@ -107,14 +108,20 @@ def evaluate(node):
 
         if hasattr(classname, "call"):
             return classname.call(functions)
-    
 
     elif isinstance(node, ModuleAccess):
-        # First check imported modules
+        # First check builtin modules (e.g. `math`) registered in runtime.builtins
+        if node.module_name in builtins and isinstance(builtins[node.module_name], dict):
+            module = builtins[node.module_name]
+            if node.member_name not in module:
+                raise InterpreterError(f"Module '{node.module_name}' has no member '{node.member_name}'")
+            return module[node.member_name]
+
+        # Then check imported modules
         if node.module_name in env.modules:
             module = env.modules[node.module_name]
             if node.member_name not in module:
-                raise Exception(f"Module '{node.module_name}' has no member '{node.member_name}'")
+                raise InterpreterError(f"Module '{node.module_name}' has no member '{node.member_name}'")
             return module[node.member_name]
 
         # Then check locally defined classes
@@ -123,12 +130,11 @@ def evaluate(node):
             for s in classname.body:
                 if isinstance(s, Functions) and s.name == node.member_name:
                     return s
-            raise Exception(f"Class '{node.module_name}' has no member '{node.member_name}'")
+            raise InterpreterError(f"Class '{node.module_name}' has no member '{node.member_name}'")
 
-        raise Exception(f"Module or class '{node.module_name}' is not defined")  # Functions node or variable
-
-
+        raise InterpreterError(f"Module or class '{node.module_name}' is not defined")  # Functions node or variable
 
 
+    
     else:
-        raise Exception(f"Cannot evaluate node: {node}")
+        raise InterpreterError(f"Cannot evaluate node: {node}")

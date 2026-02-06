@@ -2,9 +2,11 @@
 
 import argparse
 import os
+import sys
 from lexer import tokenize
 from parser import Parser
 from interpreter.interpreter import run
+from error import BaseError
 
 # -------------------------------
 # Argument parsing
@@ -59,8 +61,13 @@ else:
 # -------------------------------
 # Tokenize, parse, run
 # -------------------------------
-tokens = tokenize(code)
-parser = Parser(tokens)
-ast = parser.parse()
-
-run(ast)
+try:
+  tokens = tokenize(code)
+  parser = Parser(tokens)
+  ast = parser.parse()
+  run(ast)
+except BaseError as e:
+    print(f"[Interpreter Error] {e}")
+except Exception as e:
+    print("[Interpreter Error] Internal interpreter error")
+    raise  # <-- VERY IMPORTANT during development

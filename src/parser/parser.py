@@ -49,6 +49,10 @@ class Parser(
 
     def parse(self):
         stmts = []
-        while self.current()[0] is not None:
+        while True:
+            t = self.current()[0]
+            # stop at EOF or when token type is None (older token formats)
+            if t is None or t == 'EOF':
+                break
             stmts.append(self.parse_statement())
         return stmts

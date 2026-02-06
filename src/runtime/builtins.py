@@ -1,3 +1,6 @@
+from error import InterpreterError
+
+
 class BuiltinFunction:
     def __init__(self, fn, arity=None):
         self.fn = fn
@@ -5,11 +8,23 @@ class BuiltinFunction:
 
     def call(self, args):
         if self.arity is not None and len(args) != self.arity:
-            raise Exception("Wrong number of arguments")
-        return self.fn(*args)
+            raise InterpreterError("Wrong number of arguments")
+        try:
+            return self.fn(*args)
+        except InterpreterError:
+            raise
+        except Exception:
+            # Hide internal python errors from the user; surface as interpreter error
+            raise InterpreterError("Runtime error in builtin function")
 
 
-builtins = {}
+builtins = {
+    "ሂሳብ": {},
+    "ጽሁፍ": {},
+    "ዝርዝር": {},
+    "ፋይል": {},
+    "ኢንተርኔት": {}
+}
 
 # --------  MATH ---------------
 import math 
@@ -55,20 +70,19 @@ def b_atan(x):
     return math.atan(x)
 
 
-builtins["abs"]  = BuiltinFunction(b_abs, 1)
-builtins["round"]  = BuiltinFunction(b_round, 2)
-builtins["sqrt"]  = BuiltinFunction(b_sqrt, 1)
-builtins["pow"]  = BuiltinFunction(b_pow, 2)
-builtins["max"]  = BuiltinFunction(b_max)
-builtins["min"]  = BuiltinFunction(b_min)
-builtins["randint"]  = BuiltinFunction(b_randint, 2)
-builtins["sin"]  = BuiltinFunction(b_sin, 1)
-builtins["cos"]  = BuiltinFunction(b_cos, 1)
-builtins["tan"]  = BuiltinFunction(b_tan, 1)
-builtins["asin"]  = BuiltinFunction(b_asin, 1)
-builtins["acos"]  = BuiltinFunction(b_acos, 1)
-builtins["atan"]  = BuiltinFunction(b_atan, 1)
-
+builtins["ሂሳብ"]["abs"]  = BuiltinFunction(b_abs, 1)
+builtins["ሂሳብ"]["round"]  = BuiltinFunction(b_round, 2)
+builtins["ሂሳብ"]["sqrt"]  = BuiltinFunction(b_sqrt, 1)
+builtins["ሂሳብ"]["pow"]  = BuiltinFunction(b_pow, 2)
+builtins["ሂሳብ"]["max"]  = BuiltinFunction(b_max)
+builtins["ሂሳብ"]["min"]  = BuiltinFunction(b_min)
+builtins["ሂሳብ"]["randint"]  = BuiltinFunction(b_randint, 2)
+builtins["ሂሳብ"]["sin"]  = BuiltinFunction(b_sin, 1)
+builtins["ሂሳብ"]["cos"]  = BuiltinFunction(b_cos, 1)
+builtins["ሂሳብ"]["tan"]  = BuiltinFunction(b_tan, 1)
+builtins["ሂሳብ"]["asin"]  = BuiltinFunction(b_asin, 1)
+builtins["ሂሳብ"]["acos"]  = BuiltinFunction(b_acos, 1)
+builtins["ሂሳብ"]["atan"]  = BuiltinFunction(b_atan, 1)
 
 # -------- String -----------
 
@@ -82,11 +96,31 @@ def b_replace(value, old, new):
 def b_split(value, separator):
     return value.split(separator)
 
-builtins["ርዝመት"] = BuiltinFunction(b_len, 1)
-builtins["ተካ"] = BuiltinFunction(b_replace, 3)
-builtins["ክፈል"] = BuiltinFunction(b_split, 2)
+builtins["ጽሁፍ"]["ርዝመት"] = BuiltinFunction(b_len, 1)
+builtins["ጽሁፍ"]["ተካ"] = BuiltinFunction(b_replace, 3)
+builtins["ጽሁፍ"]["ክፈል"] = BuiltinFunction(b_split, 2)
+
+# --------- Data type conversion ----------
+def b_tostr(value):
+    return str(value)
+def b_toint(value):
+    return int(value)
+def b_tofloat(value):
+    return float(value)
+
+builtins["ወደጽሁፍ"] = BuiltinFunction(b_tostr, 1)
+builtins["ወደቁጥር"] = BuiltinFunction(b_toint, 1)
+builtins["ወደነጥብቁጥር"] = BuiltinFunction(b_tofloat, 1)
+# --------- List Variables ------------
+
+def b_append(value, var=None):
+    if var is None:
+        var = []
+    var.append(value)
+    return var
 
 
+builtins["ዝርዝር"]["ጨምር"] = BuiltinFunction(b_append, 2)
 
 # -------- FILE I/O BUILTINS --------
 
@@ -118,10 +152,10 @@ def b_close(file_or_path):
 
 
 
-builtins["ክፈት"]  = BuiltinFunction(b_open, 2)
-builtins["አንብብ"]  = BuiltinFunction(b_read, 1)
-builtins["ጻፍ"] = BuiltinFunction(b_write, 2)
-builtins["ዝጋ"] = BuiltinFunction(b_close, 1)
+builtins["ፋይል"]["ክፈት"]  = BuiltinFunction(b_open, 2)
+builtins["ፋይል"]["አንብብ"]  = BuiltinFunction(b_read, 1)
+builtins["ፋይል"]["ጻፍ"] = BuiltinFunction(b_write, 2)
+builtins["ፋይል"]["ዝጋ"] = BuiltinFunction(b_close, 1)
 
 # --------- REQUESTING ------------
 import requests
@@ -143,4 +177,4 @@ def b_get(url, mode):
 
 
     
-builtins["አግኝ"] = BuiltinFunction(b_get, 2)
+builtins["ኢንተርኔት"]["አግኝ"] = BuiltinFunction(b_get, 2)

@@ -10,3 +10,4 @@ def fetchpokemon(pokemon):
 pokemon = input("Enter your pokemon please: ")
 response = requests.get(fetchpokemon(pokemon))
 print(response)
+
