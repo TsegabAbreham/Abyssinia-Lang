@@ -8,7 +8,7 @@ class BuiltinFunction:
 
     def call(self, args):
         if self.arity is not None and len(args) != self.arity:
-            raise InterpreterError("Wrong number of arguments")
+            raise InterpreterError("የገባው ፓራሜትር ከተጠበቀው በላይ ወይም በታች ነው።")
         try:
             return self.fn(*args)
         except InterpreterError:

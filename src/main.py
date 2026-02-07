@@ -67,7 +67,7 @@ try:
   ast = parser.parse()
   run(ast)
 except BaseError as e:
-    print(f"[Interpreter Error] {e}")
+    print(f"[የኮድ ስህተት ሪፖርት] {e}")
 except Exception as e:
-    print("[Interpreter Error] Internal interpreter error")
+    print("[የኮድ ስህተት ሪፖርት] Internal interpreter error")
     raise  # <-- VERY IMPORTANT during development

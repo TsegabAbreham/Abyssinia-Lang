@@ -23,7 +23,7 @@ def execute(stmt):
             value = evaluate(stmt.value)
 
             if list_name not in env.memory:
-                raise InterpreterError(f"Undefined list '{list_name}'")
+                raise InterpreterError(f"ያልታወቀ ዝርዝር '{list_name}'")
 
             env.memory[list_name][index] = value
 
@@ -104,7 +104,7 @@ def execute(stmt):
             # Check argument count
             if len(stmt.args) != len(func.params):
                 raise InterpreterError(
-                    f"Function '{getattr(func, 'name', stmt.name)}' expects {len(func.params)} arguments but got {len(stmt.args)}"
+                    f"ተግባር '{getattr(func, 'name', stmt.name)}' {len(func.params)} ፓራሜተሮችን ጠብቆ ነበር ግን {len(stmt.args)} አገኘ።"
                 )
 
             # Evaluate arguments
@@ -132,10 +132,10 @@ def execute(stmt):
                         func = s
                         break
                 else:
-                    raise InterpreterError(f"Class '{stmt.module_name}' has no member '{stmt.member_name}'")
+                    raise InterpreterError(f"ከፍል '{stmt.module_name}'፣ '{stmt.member_name}' ሚባል አባል የለዉም።")
 
                 if len(func.params) != 0:
-                    raise InterpreterError(f"Method '{func.name}' expects {len(func.params)} arguments")
+                    raise InterpreterError(f"ተግባር '{func.name}' {len(func.params)} ይጠብቃል።")
 
                 old_memory = env.memory
                 env.memory = {**env.memory}
@@ -150,7 +150,7 @@ def execute(stmt):
                 if stmt.member_name in module and isinstance(module[stmt.member_name], Functions):
                     func = module[stmt.member_name]
                     if len(func.params) != 0:
-                        raise InterpreterError(f"Function '{func.name}' expects {len(func.params)} arguments")
+                        raise InterpreterError(f"ተግባር '{func.name}' -> {len(func.params)} ፓራሜትር ይጠብቃል።")
                     old_memory = env.memory
                     env.memory = {**env.memory}
                     for s in func.body:
@@ -180,8 +180,6 @@ def execute(stmt):
                     instance[s.name] = s
             return instance
                 
-
-
         # expression statements
         elif isinstance(stmt, (ListAccessPos, BinOp, Variable, Number, String)):
             evaluate(stmt)
@@ -221,9 +219,9 @@ def run(ast):
         try:
             execute(stmt)
         except InterpreterError as e:
-            print(f"[Interpreter Error] {e}")
+            print(f"[የኮድ ስህተት ሪፖርት] {e}")
             return
         except Exception:
-            print("[Interpreter Error] Internal interpreter error")
-            return
+            # Hide internal python errors from the user; surface as interpreter error
+            raise InterpreterError("Runtime error in builtin function")
         

@@ -10,41 +10,16 @@ Features:
 - Convenience functions: raise_parse_error, unexpected_token, assert_token, format_error
 
 Change: prefer line/col instead of pos. For backward compatibility `pos` is accepted and mapped to `line` if needed.
-
-Example usage in your parser (short):
-
-    from error import unexpected_token, Reporter
-
-    errs = Reporter()
-    if parser.current()[0] != 'EQUAL':
-        raise unexpected_token(parser)
-
-    # or collect instead of raising
-    errs.add(unexpected_token(parser))
-    errs.raise_if_any()
-
-The parser provided by you doesn't currently store line/col in tokens, so the helpers
-work whether tokens are (TYPE, VALUE) or (TYPE, VALUE, LINE, COL). The message
-format is intentionally simple and friendly for debugging while being flexible
-for later extension.
 """
 
 from typing import Optional, Any, Tuple, List
 import sys
 
 
-class BaseError(Exception):
-    """Base class for errors produced by the language toolchain.
+# ----------------- Base Error Classes -----------------
 
-    Attributes:
-        message: human readable message
-        token: the token tuple that triggered the error (if any)
-        pos: (DEPRECATED) numeric parser position — kept for backward compatibility
-        line: optional line number (preferred)
-        col: optional column number (preferred)
-        filename: optional filename or source name
-        hint: optional quick fix hint
-    """
+class BaseError(Exception):
+    """Base class for errors produced by the language toolchain."""
 
     def __init__(self, message: str, token: Optional[Tuple[Any, ...]] = None,
                  pos: Optional[int] = None, line: Optional[int] = None,
@@ -53,7 +28,7 @@ class BaseError(Exception):
         super().__init__(message)
         self.message = message
         self.token = token
-        # Backwards compatibility: if caller passed pos but not line, use pos as line
+        # Backwards compatibility
         self.pos = pos
         self.line = line if line is not None else (pos if pos is not None else None)
         self.col = col
@@ -76,46 +51,62 @@ class InterpreterError(BaseError):
     """Raised at runtime when evaluating the AST (e.g. undefined var, type error)."""
 
 
+# ----------------- Token Translation -----------------
+
+def translate_token_type(token_type: Optional[str]) -> str:
+    """Translate a token type string into Amharic."""
+    translations = {
+        'DOT': 'ነጥብ',
+        'SEMICOLON': 'አራት ነጥብ -> ።',
+        'LPAREN': 'መክፈቻ ቅንፍ -> (',
+        'RPAREN': 'መዝጊያ ቅንፍ -> )',
+        'COMMA': 'ነጠላ ሰረዝ -> ፣',
+        'LBRACKET': 'መክፈቻ የተጠማዘዘ ቅንፍ -> {',
+        'RBRACKET': 'መዝጊያ የተጠማዘዘ ቅንፍ -> }',
+        'SLBRACKET': 'መክፈቻ ስኩኤር ቅንፍ -> [',
+        'SRBRACKET': 'መዝጊያ ስኩኤር ቅንፍ -> ]',
+        'NUMBER': 'ቁጥር'
+    }
+    if token_type is None:
+        return "<None>"
+    # ensure non-string token types (e.g., Token objects) are stringified
+    key = token_type if isinstance(token_type, str) else str(token_type)
+    return translations.get(key, key)
+
+
+# ----------------- Token Normalization -----------------
+
 def _normalize_token(token: Optional[Tuple[Any, ...]]):
-    """Normalize token tuples into a dict with keys: type, value, line, col.
-
-    Supported incoming shapes:
-      (TYPE, VALUE)
-      (TYPE, VALUE, LINE, COL)
-      None
-
-    """
+    """Normalize token tuples into a dict with keys: type, value, line, col."""
     if token is None:
         return {"type": None, "value": None, "line": None, "col": None}
     if not isinstance(token, (list, tuple)):
-        # allow passing Token objects by mistake; fall back to string
         return {"type": str(token), "value": None, "line": None, "col": None}
-
     if len(token) >= 4:
         ttype, value, line, col = token[0], token[1], token[2], token[3]
+        # coerce type to string when possible for consistent translation
+        if not isinstance(ttype, str):
+            ttype = str(ttype)
         return {"type": ttype, "value": value, "line": line, "col": col}
     if len(token) == 2:
         ttype, value = token
+        if not isinstance(ttype, str):
+            ttype = str(ttype)
         return {"type": ttype, "value": value, "line": None, "col": None}
-
-    # otherwise try best-effort
     return {"type": token[0] if len(token) > 0 else None,
             "value": token[1] if len(token) > 1 else None,
             "line": None, "col": None}
 
 
-def format_error(err: BaseError) -> str:
-    """Create a readable one-line or multi-line error message for an error object.
+# ----------------- Error Formatting -----------------
 
-    This function keeps output small but includes token type/value and location
-    when available. It now prefers line/col over the deprecated pos.
-    """
+def format_error(err: BaseError) -> str:
+    """Create a readable error message with token translations."""
     t = _normalize_token(err.token)
     loc = ""
     if err.filename:
         loc += f"{err.filename}"
 
-    # Prefer explicit line/col from the error object, then token info, then (deprecated) pos
     line = err.line if getattr(err, "line", None) is not None else t.get("line")
     col = err.col if getattr(err, "col", None) is not None else t.get("col")
 
@@ -124,16 +115,15 @@ def format_error(err: BaseError) -> str:
         if col is not None:
             loc += f":{col}"
     elif err.pos is not None:
-        # fallback (kept for compatibility) — show pos only if no line available
         loc += f" (pos={err.pos})"
 
     token_info = ""
     if t.get("type") is not None:
-        token_info = f"token={t['type']}"
+        token_info = f"token={translate_token_type(t['type'])}"
         if t.get("value") is not None:
             token_info += f"({repr(t['value'])})"
 
-    parts = [f"Error: {err.message}"]
+    parts = [f"ስህተት: {err.message}"]
     if token_info:
         parts.append(token_info)
     if loc:
@@ -144,93 +134,68 @@ def format_error(err: BaseError) -> str:
     return " — ".join(parts)
 
 
-# Convenience helper functions -------------------------------------------------
-
+# ----------------- Convenience Functions -----------------
 
 def raise_parse_error(message: str, token: Optional[Tuple[Any, ...]] = None,
                       pos: Optional[int] = None, line: Optional[int] = None,
                       col: Optional[int] = None, filename: Optional[str] = None,
                       hint: Optional[str] = None) -> ParseError:
-    """Create and return a ParseError (caller may raise it).
-
-    This keeps the error construction consistent across the project.
-
-    Backwards compatibility: callers supplying `pos` will map to `line` if `line` is
-    not explicitly provided.
-    """
+    """Create and return a ParseError."""
     return ParseError(message, token=token, pos=pos, line=line, col=col,
                       filename=filename, hint=hint)
 
 
 def unexpected_token(parser_or_token: Any, expected: Optional[str] = None,
                      hint: Optional[str] = None) -> ParseError:
-    """Create a ParseError for an unexpected token.
-
-    Accepts either a parser-like object with .current() and optional attributes
-    like .line, .lineno, .col, or a token tuple. If a parser is passed the function
-    tries to extract a token and location information.
-    """
+    """Create a ParseError for an unexpected token."""
     token = None
     line = None
     col = None
     filename = None
 
-    # parser-like object
     if hasattr(parser_or_token, "current"):
         try:
             token = parser_or_token.current()
         except Exception:
             token = None
-        # try several common names for line/col on parsers
-        line = getattr(parser_or_token, "line", None)
-        if line is None:
-            line = getattr(parser_or_token, "lineno", None)
-        # some parsers store column as `col` or `column`
+        line = getattr(parser_or_token, "line", None) or getattr(parser_or_token, "lineno", None)
         col = getattr(parser_or_token, "col", None) or getattr(parser_or_token, "column", None)
         filename = getattr(parser_or_token, "filename", None)
     else:
         token = parser_or_token
 
-    # If token contains line/col prefer those if explicit line wasn't found
     t = _normalize_token(token)
     if line is None and t.get("line") is not None:
         line = t.get("line")
     if col is None and t.get("col") is not None:
         col = t.get("col")
 
-    found = f"{t.get('type') or '<EOF>'}"
+    # translate the found token type (if possible) for human-friendly output
+    found_type = translate_token_type(t.get('type')) if t.get('type') is not None else '<EOF>'
+    found = f"{found_type}"
     if t.get("value") is not None:
         found += f"({t['value']})"
 
-    msg = f"Unexpected token: found {found}"
+    msg = f"ያልተጠበቀ ቃል ተገኘ: {found}"
     if expected:
-        msg += f", expected {expected}"
+        msg += f", ተጠበቆ የነበረው ቃል፡ {translate_token_type(expected)}"
 
+    # keep token tuple intact, translation handled in format_error
     return raise_parse_error(msg, token=token, line=line, col=col, filename=filename, hint=hint)
 
 
 def assert_token(parser, expected_type: str, expected_name: Optional[str] = None,
                  hint: Optional[str] = None) -> None:
-    """Assert that the parser.current() token is expected_type, otherwise raise.
-
-    This helper is handy to keep parser code smaller:
-
-        assert_token(self, 'LPAREN', hint='function calls need ()')
-    """
+    """Assert that parser.current() token is expected_type, otherwise raise."""
     type_, value = parser.current()
     if type_ != expected_type:
         raise unexpected_token(parser, expected=expected_name or expected_type, hint=hint)
 
 
-# Reporter to collect multiple errors -----------------------------------------
-
+# ----------------- Reporter Class -----------------
 
 class Reporter:
-    """Collects multiple errors and prints them at once.
-
-    Use this when you want to collect and show a list of errors instead of
-    failing fast on the first one.
-    """
+    """Collects multiple errors and prints them at once."""
 
     def __init__(self):
         self._errors: List[BaseError] = []
@@ -256,13 +221,11 @@ class Reporter:
 
     def raise_if_any(self) -> None:
         if self.has_errors():
-            # If multiple errors, combine into one message for raising
             messages = [format_error(e) for e in self._errors]
             raise ParseError("Multiple errors:\n" + "\n".join(messages))
 
 
-# Small utility for in-place debugging ---------------------------------------
-
+# ----------------- Utility -----------------
 
 def fatal(msg: str) -> None:
     """Print a message and exit; a tiny helper for CLI tools and quick scripts."""

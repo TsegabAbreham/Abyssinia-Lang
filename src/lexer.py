@@ -180,7 +180,7 @@ def tokenize(code: str):
         if not matched:
             # Provide token and line/col so the error formatting can show location
             raise LexerError(
-                f"Unexpected character: {ch!r}",
+                f"ያልተጠበቀ ምልክት -> {ch!r}",
                 token=("CHAR", ch, line, col),
                 line=line,
                 col=col
