@@ -174,7 +174,7 @@ File 2 (main.aby):
 አሳይ(ይይ፡ነብዩ("33"))።
 ```
 
-## Bulit-in Functions 
+## Built-in Functions 
 There are a wide range of built-in functions including math, string manipulation, list manipulation, file I/O, and requesting (Python is required for this one)
 
 Using these Built-in Functions preview:
