@@ -12,7 +12,7 @@ Python libraries inside the language (requires the install of Python to do that)
 
 
 # Installation
-To install Abyssinia Lang on you computer go to the releases in the middle-right window and download the latest release. One you do that run the setup in full and open CMD and type Abyss, if it shows a lion ASCII art it means it is successfully installed.
+To install Abyssinia Lang on you computer go to the releases in the middle-right window and download the latest release. One you do that run the setup in full and open CMD and type Abyss, if it shows a lion ASCII art it means it is successfully installed. One misconception is that since this is written in Python the program needs python to run, however, that is not true, Abyssinia Lang will run even if Python is not installed. Python is needed to access Python libraries through Abyssinia Lang.
 
 
 # Basic Usage Guide to Abyssinia Lang
@@ -86,16 +86,122 @@ Example:
 
 # Use this to call the function back and pass in your parameters #
 ሙከራ(1፣ 5)።
+```
+
+## Getting User Input
+You can get user input through the keyword `ጠይቅ`.
+
+Example:
+```
+የ = ጠይቅ("ስምህ ማነዉ")።
+አሳይ("ሰላም " + የ)።
+```
+
+## Lists 
+For creating a list create an ordinary variable and fill in the list using '[]'.
+Example:
+```
+ሃ = [1፣ 2፣ 3፣ 4፣ 5]።
+# Display the first element on the list ·
+አሳይ(ሃ[0])።
+```
+
+## Loops
+
+### While loops
+For using a while loop use the keyword `እያለ`.
+
+Example:
+```
+ገ = 1።
+
+እያለ(ገ != 5){
+    አሳይ(ገ)።
+    ገ = ገ+1።
+}
+```
+### For loops
+For loops have different parts, the keyword (`ለ`) the variable that is changed and the range of change.
+
+Example:
+```
+ሮ  15።
+
+ለ (ሁ፣ ከ 1 እስከ 10){
+    አሳይ(ሁ)።
+}
+```
+
+## Classes
+Classes in this programming language are just a collection of functions and do not contain OOP things like inheritance or encapslation.
+
+Here is how to use it:
+```
+ክፍል ሃ{
+    ተግባር ሙከራ1(){
+        አሳይ("ያአህፍህ")።
+    }
+    ተግባር ሙከራ2(){
+        ቁጥሮች = [1፣ 2፣ 3፣ 4፣ 5፣ 6፣ 7፣ 8፣ 9]።
+        አሳይ(ቁጥሮች[5])። 
+    }
+}
+
+# We use '፡' to access a function from a class #
+ሃ፡ሙከራ1()።
+ሃ፡ሙከራ2()።
 
 ```
 
+## Importing Files
+To import external variables, functions, or classes from another Abyssinia Lang files all you have to do is use the keyword `አስገባ`
+Example:
 
+File 1 (test.aby):
+```
+ተግባር ነብዩ(ሽ){
+    አሳይ(ሽ)።
+}
+```
 
+File 2 (main.aby):
+```
+አስገባ "test.aby" እንደ ይይ
 
+አሳይ(ይይ፡ነብዩ("33"))።
+```
 
+## Bulit-in Functions 
+There are a wide range of built-in functions including math, string manipulation, list manipulation, file I/O, and requesting (Python is required for this one)
 
+Using these Built-in Functions preview:
 
+```
+# File I/O #
+f = ፋይል፡ክፈት("test.txt", "w")።
+ፋይል፡ጻፍ(f, "Hello Abyss")። 
+ፋይል፡ዝጋ(f)።
 
+r = ፋይል፡ክፈት("test.txt", "r")።
+text = ፋይል፡አንብብ(r)።
+ፋይል፡ዝጋ(r)።
 
+አሳይ(text)።
+
+# Math #
+
+አሳይ(ሂሳብ፡sin(90))።
+
+# String #
+
+መ = "ሃ፣ላ፣ፍ፣ር፣እ፣ቅ"።
+አሳይ(ጽሁፍ፡ክፈል(መ፣ "፣"))።
+አሳይ(መ[0])።
+```
+
+## Using Python's Library in Abyssinia Lang
+Using Python's library in Abyssinia Lang is supported. Though the downside here is that you have to install that library you are trying to access beforehand.
+
+This feature is on work right now and will be release when done...
 
 
