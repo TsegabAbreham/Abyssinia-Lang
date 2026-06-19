@@ -18,7 +18,84 @@ To install Abyssinia Lang on you computer go to the releases in the middle-right
 # Basic Usage Guide to Abyssinia Lang
 The Syntax for Abyssinia Lang is very similar to Python with language exceptions. Here are some basic usage of the language
 
+## Running a code
+To run an Abyssinia Lang code first create a file with the extension `.aby` then on the CMD type `abyss -f yourfilename.aby`.
+
 ## Comments 
 To do a single line comment start with '#' and when done close with that same '#', example:
     
     # ሙከራ አስታየት #
+To do multiline comments start with "~~" and end with those same characters, example:
+```
+   ~~
+   ሙከራ አስታየት 
+   ሙከራ አስታየት 1  
+   ሙከራ አስታየት 2  
+   ~~
+```
+## Printing
+To do a simple hello world program you simple use the keyword 'አሳይ'
+
+Example:
+`
+አሳይ("Hello World")።
+
+Note: when finishing a line you should always finish with a semicolon (;) or an amharic four dot full stop (።).
+
+## Variables
+Creating a variable is simple, unlike C/C++ or other low-level languages you don't to define variable type instead it is like python:
+
+`
+ሙከራ_ተልዋዋጭ = 5።
+`
+
+## Conditionals
+Using conditionals in Abyssinia Lang is simple you just have to know the keywords which are:
+ - if -> ከሆነ
+ - else if -> ካልሆነ
+ - else -> ሌላ
+
+ - and -> እና, it can also be '&&'
+ - or '> ወይም, it can also be '||'
+
+
+An example can be:
+```
+ሃ = 10።
+ለ = 20።
+
+ከሆነ (ሃ > ለ) {
+   አሳይ("ሃ ከ ለ ይበልጣል")።
+}
+ካልሆነ (ሃ < ለ) {
+   አሳይ("ለ ከ ሃ ይበልጣል")።
+}
+ሌላ {
+  አሳይ("እኩል ናቸው")።
+}
+```
+## Functions 
+Using functions are also simple you define a function by using the keyword `ተግባር` then followed by the name of your function. You can also pass in parameters to the function like any other function. Note when you are passing in parameters using `፣` as a separater of parameters, if you don't want to use that use a regular comma (,) and it will work without any other problem.
+
+Example:
+```
+ተግባር ሙከራ(ቁጥር1፣ ቁጥር2) {
+    አሳይ(ቁጥር1 + 1)።
+    አሳይ(ቁጥር2 + 1)።
+}
+
+# Use this to call the function back and pass in your parameters #
+ሙከራ(1፣ 5)።
+
+```
+
+
+
+
+
+
+
+
+
+
+
