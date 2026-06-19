@@ -14,6 +14,9 @@ Python libraries inside the language (requires the install of Python to do that)
 # Installation
 To install Abyssinia Lang on you computer go to the releases in the middle-right window and download the latest release. One you do that run the setup in full and open CMD and type Abyss, if it shows a lion ASCII art it means it is successfully installed. One misconception is that since this is written in Python the program needs python to run, however, that is not true, Abyssinia Lang will run even if Python is not installed. Python is needed to access Python libraries through Abyssinia Lang.
 
+<img width="1123" height="669" alt="image" src="https://github.com/user-attachments/assets/1fc7b152-7d57-4e0d-975f-393f05fc5ebb" />
+
+
 
 # Basic Usage Guide to Abyssinia Lang
 The Syntax for Abyssinia Lang is very similar to Python with language exceptions. Here are some basic usage of the language
